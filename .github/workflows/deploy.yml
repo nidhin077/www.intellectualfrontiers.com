@@ -29,10 +29,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '20.3.0'
-          
-      # Step 3: Install dependencies from package.json
-      - name: Install dependencies
-        run: npm install
 
       # Step 5: Build the Astro site (output will be in the 'dist' directory)
       - name: Build
