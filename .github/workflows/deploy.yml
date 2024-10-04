@@ -33,9 +33,7 @@ jobs:
       # Step 5: Build the Astro site (output will be in the 'dist' directory)
       - name: Build
         run: |
-          npm install pnpm -g  
-          pnpm install
-          npm run build
+          npm run deno-deploy
           
       # Step 6: Deploy to GitHub Pages using the 'dist' directory
       - name: Deploy to GitHub Pages
