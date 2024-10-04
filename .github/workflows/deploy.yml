@@ -1,42 +1,49 @@
-name: CI/CD Workflow
+name: Deploy to GitHub Pages
+
+# This workflow is triggered on a push to the 'main' branch
 on:
   push:
     branches:
       - main
+  # Also allows for manual deployment
   workflow_dispatch:
 
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build-and-deploy:
+  build:
+    # Run the job on the latest Ubuntu environment
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install SSH Client
-        run: |
-          sudo apt update
-          sudo apt install openssh-client -y
+      # Step 2: Set up Node.js version 20.30
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.3.0'
+          
+      # Step 3: Install dependencies from package.json
+      - name: Install dependencies
+        run: npm install
 
-      - name: Set up SSH agent
+      # Step 5: Build the Astro site (output will be in the 'dist' directory)
+      - name: Build
         run: |
-          eval $(ssh-agent -s)
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo -e "${{ secrets.SSH_PRIVATE_KEY_PROD }}" >> ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
-
-      - name: Install dependencies and build using npm
-        run: "npm run deno-deploy"
-
-      - name: Archive build artifacts
-        run: |
-          tar -czvf intellectualfrontiers.tar.gz deno-deploy
-
-      - name: Copy build artifacts to the production server
-        run: |
-          scp -P22 -o StrictHostKeyChecking=no intellectualfrontiers.tar.gz "${{ secrets.PRODUCTION_DEPLOYMENT_USER }}@${{ secrets.PRODUCTION_DEPLOYMENT_SERVER_IP }}:"
-
-      - name: Deploy to production server
-        run: |
-          ssh -p22 -o StrictHostKeyChecking=no -t ${{ secrets.PRODUCTION_DEPLOYMENT_USER }}@${{ secrets.PRODUCTION_DEPLOYMENT_SERVER_IP }} "bash -i intellectual-frontiers.sh"
+          deno --version
+          npm run build
+          
+      # Step 6: Deploy to GitHub Pages using the 'dist' directory
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.SURVEILR_GITHUB_TOKEN }}
+          publish_dir: ./dist
+           
