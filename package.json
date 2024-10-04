@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build-1": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier -w .",
     "lint:eslint": "eslint . --ext .js,.ts,.astro",
-    "deno-deploy": "npm install pnpm -g && pnpm install && pnpm run build && mv dist/ deno-deploy"
+    "build": "npm install pnpm -g && pnpm install && pnpm run build"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.7",
